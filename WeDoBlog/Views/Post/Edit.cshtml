@@ -11,7 +11,7 @@
 		<h1>Edit your Post</h1>
 	</div>
 	<div class="col-6 text-end">
-		<a class="btn btn-outline-primary" asp-action="Index" asp-controller="Post" >Back To List</a>
+		<a class="btn btn-outline-primary" asp-action="Index" asp-controller="Post" ><i class="fa-solid fa-circle-arrow-left"></i> Back To List</a>
 	</div>
 </div>
 <hr />
@@ -21,7 +21,7 @@
 
 	</div>
 
-	<input asp-formaction="Post.Id" type="hidden" />
+	<input asp-for="Post.Id" type="hidden" />
 	<div class="form-class mt-3">
 		<label asp-for="Post.Title" class="fw-bold"></label>
 		<input asp-for="Post.Title" class="form-control"/>
@@ -52,7 +52,7 @@
 		<label asp-for="FeatureImage" class="fw-bold"></label>
 		<input asp-for="FeatureImage" type="file" class="form-control" />
 	</div>
-	<button type="submit" class="btn btn-outline-primary mt-3">Save</button>
+	<button type="submit" class="btn btn-outline-primary mt-3"><i class="fa-solid fa-floppy-disk"></i> Save</button>
 	<a class="btn btn-outline-info mt-3" asp-action="Index" asp-controller="Post">Back To List</a>
 </form>
 </div>

@@ -15,6 +15,7 @@ namespace WeDoBlog.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly string[] allowedextensions = { ".jpg", ".png", ".jpeg" };
 
+
         public PostController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             this.context = context;
@@ -67,6 +68,7 @@ namespace WeDoBlog.Controllers
             
             return View(postViewModel);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Create(PostViewModel postViewModel)
@@ -141,11 +143,17 @@ namespace WeDoBlog.Controllers
             return View(editViewModel);
         }
 
+
         [HttpPost]
         public async Task<IActionResult > Edit(EditViewModel editViewModel)
         {
             if (!ModelState.IsValid)
             {
+                editViewModel.Categories = context.Categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList();
                 return View(editViewModel);
             }
             var postFromDb = await context.Posts.FirstOrDefaultAsync(p => p.Id == editViewModel.Post.Id);
@@ -175,11 +183,60 @@ namespace WeDoBlog.Controllers
             {
                 editViewModel.Post.FeatureImagePath = postFromDb.FeatureImagePath;
             }
-            context.Posts.Update(editViewModel.Post);
+
+            postFromDb.Title = editViewModel.Post.Title;
+            postFromDb.Author = editViewModel.Post.Author;
+            postFromDb.CategoryId = editViewModel.Post.CategoryId;
+            postFromDb.Content = editViewModel.Post.Content;
+            postFromDb.FeatureImagePath= editViewModel.Post.FeatureImagePath;
+
+            //context.Posts.Update(editViewModel.Post);
             await context.SaveChangesAsync();
             return RedirectToAction("Index", "Post");
 
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            var post = await context.Posts.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+           
+
+            return View(post);
+        }
+
+
+        [HttpPost]
+        [ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirm(int id)
+        {
+            var post= await context.Posts.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            if(!string.IsNullOrEmpty(post.FeatureImagePath))
+            {
+                var existingfilePath = Path.Combine(webHostEnvironment.WebRootPath, "Images", Path.GetFileName(post.FeatureImagePath));
+                if (System.IO.File.Exists(existingfilePath))
+                {
+                    System.IO.File.Delete(existingfilePath);
+                }
+            }
+            context.Posts.Remove(post);
+            await context.SaveChangesAsync();
+            return RedirectToAction("Index", "Post");
+        }
+
 
         private  async Task<string> UploadFiletoFolder(IFormFile file)
         {

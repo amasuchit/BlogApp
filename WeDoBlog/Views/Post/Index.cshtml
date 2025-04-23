@@ -11,14 +11,14 @@
 		{
 			foreach (var category in ViewBag.Categories)
 			{
-							<a asp-action="Index" asp-controller="Post" asp-route-categoryId="@category.Id" class="badge bg-warning text-decoration-none ms-2">@category.Name</a>
+							<a asp-action="Index" asp-controller="Post" asp-route-categoryId="@category.Id" class="badge bg-primary text-decoration-none ms-2">@category.Name</a>
 			}
 		}
 	}
 </div>
 
 <div class="text-end">
-	<a class="btn btn-outline-primary btn-sm my-2" asp-action="Create" asp-controller="Post">Create New Post</a>
+	<a class="btn btn-outline-primary btn-sm my-2" asp-action="Create" asp-controller="Post"><i class="fa-solid fa-plus"></i> Create Post</a>
 </div>
 
 
@@ -27,14 +27,20 @@
 	{
 			<div class="col">
 				<div class="card h-100 border-0 shadow-lg rounded-1">
+							
+						<a asp-action="Details" asp-controller="Post" asp-route-id="@post.Id">
 							<img src="@post.FeatureImagePath" 
-							class="card-img-top" 
-							alt="@post.Title" 
-							style="height:300px;object-fit:cover" />
-
+								class="card-img-top" 
+								alt="@post.Title" 
+								style="height:300px;object-fit:cover" />
+					</a>
+					
 							<div class="card-body">
-								<h5 class="card-title">@post.Title</h5>
-								<p class="text-muted mb-2">Published on @post.PublishedDate.ToString("MMM dd, yyyy")</p>
+									<a asp-action="Details" asp-controller="Post" asp-route-id="@post.Id" style="text-decoration:none;">
+										<h5 class="card-title">@post.Title</h5>
+								</a>
+								
+										<p class="text-muted mb-2"><i class="fa-solid fa-calendar-days"></i> @post.PublishedDate.ToString("MMM dd, yyyy")</p>
 
 					@{
 
@@ -45,16 +51,18 @@
 								<p class="card-text">
 						@(content.Length > 90 ? content.Substring(0, 90) + "..." : content)
 								</p>
-
-
-								<span class="badge bg-secondary">@post.Category?.Name</span>
+									
+									<a asp-action="Index" asp-controller="Post" asp-route-categoryId="@post.CategoryId">
+												<span class="badge bg-secondary">@post.Category?.Name</span>
+									</a>
+								
 							</div>
 
 							<div class="card-footer d-flex justify-content-between align-item-center">
 								<a class="btn btn-info btn-sm" asp-action="Details" asp-controller="Post" asp-route-id="@post.Id">Read More</a>
 								<div class="text-end">
 									<div class="text-muted">
-										By @post.Author
+												<i class="fa-solid fa-pen-nib"></i> @post.Author
 									</div>
 								</div>
 							</div>

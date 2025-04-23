@@ -9,6 +9,8 @@ namespace WeDoBlog.Models.ViewModel
 
         [ValidateNever]
         public IEnumerable<SelectListItem> Categories { get; set; }
+
+        [ValidateNever]
         public IFormFile FeatureImage { get; set; }
 
     }

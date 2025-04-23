@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace WeDoBlog.Models.ViewModel
 {
@@ -9,6 +10,8 @@ namespace WeDoBlog.Models.ViewModel
 
         [ValidateNever]
         public IEnumerable<SelectListItem> Categories { get; set; }
+
+        [Display(Name ="Feature Image")]
         public IFormFile FeatureImage { get; set; }
     }
 }
