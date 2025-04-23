@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 using WeDoBlog.Data;
+using WeDoBlog.Models;
 using WeDoBlog.Models.ViewModel;
 
 namespace WeDoBlog.Controllers
@@ -50,7 +53,6 @@ namespace WeDoBlog.Controllers
         }
 
 
-
         [HttpGet]
         public IActionResult Create()
         {
@@ -96,6 +98,88 @@ namespace WeDoBlog.Controllers
             return View(postViewModel);
         }
 
+
+        [HttpPost]
+        public JsonResult AddComment([FromBody]Comment comment)
+        {
+            comment.CommentDate = DateTime.Now;
+            context.Add(comment);
+            context.SaveChanges();
+
+            return Json(new 
+            {
+                success = true,
+                username = comment.UserName,
+                commentDate = comment.CommentDate.ToString("MMM dd, yyyy"),
+                content = comment.Content
+            });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if(id == 0)
+            {
+                return NotFound();
+            }
+
+            var datafromdb= await context.Posts.FirstOrDefaultAsync(p => p.Id == id);
+            if (datafromdb == null)
+            {
+                return NotFound();
+            }
+            EditViewModel editViewModel = new EditViewModel
+            {
+                Post = datafromdb,
+                Categories = context.Categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList()
+            };
+            return View(editViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult > Edit(EditViewModel editViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(editViewModel);
+            }
+            var postFromDb = await context.Posts.FirstOrDefaultAsync(p => p.Id == editViewModel.Post.Id);
+            if (postFromDb == null)
+            {
+                return NotFound();
+            }
+            if (editViewModel.FeatureImage!=null)
+            {
+                var inputFileExtension = Path.GetExtension(editViewModel.FeatureImage.FileName).ToLower();
+                bool isAllowed = allowedextensions.Contains(inputFileExtension);
+                if (!isAllowed)
+                {
+                    ModelState.AddModelError("FeatureImage", "Invalid file type. Allowed types are: .jpg, .jpeg, .png");
+                    return View(editViewModel);
+                }
+                var existingfilePath = Path.Combine(webHostEnvironment.WebRootPath,"Images", Path.GetFileName(postFromDb.FeatureImagePath));
+                if (System.IO.File.Exists(existingfilePath))
+                {
+                    System.IO.File.Delete(existingfilePath);
+                }
+
+                editViewModel.Post.FeatureImagePath = await UploadFiletoFolder(editViewModel.FeatureImage);
+
+            }
+            else
+            {
+                editViewModel.Post.FeatureImagePath = postFromDb.FeatureImagePath;
+            }
+            context.Posts.Update(editViewModel.Post);
+            await context.SaveChangesAsync();
+            return RedirectToAction("Index", "Post");
+
+        }
 
         private  async Task<string> UploadFiletoFolder(IFormFile file)
         {
