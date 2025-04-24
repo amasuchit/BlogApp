@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using WeDoBlog.Data;
+using WeDoBlog.Models;
 using WeDoBlog.Models.ViewModel;
 
 namespace WeDoBlog.Controllers
@@ -26,15 +27,35 @@ namespace WeDoBlog.Controllers
             return View(category);
         }
 
-
-         public IActionResult Create()
+        [HttpGet]
+         public async Task<IActionResult> Create()
         {
             CategoryViewModel categoryViewModel = new CategoryViewModel();
             return View(categoryViewModel);
         }
 
 
-         public IActionResult Edit()
+        [HttpPost]
+         public async Task<IActionResult> Create(CategoryViewModel categoryViewModel)
+        {
+
+            
+            if (ModelState.IsValid)
+            {
+                var category= new Category
+                {
+                    Name = categoryViewModel.Name,
+                    Description = categoryViewModel.Description
+                };
+                context.Categories.Add(category);
+                await context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            return View(categoryViewModel);
+        }
+
+
+         public IActionResult Edit(int id)
         {
             return View();
         }
