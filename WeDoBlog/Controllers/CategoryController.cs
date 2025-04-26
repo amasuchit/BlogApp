@@ -19,8 +19,8 @@ namespace WeDoBlog.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var category= await context.Categories.ToListAsync();
-            if(category == null)
+            var category = await context.Categories.ToListAsync();
+            if (category == null)
             {
                 return NotFound();
             }
@@ -28,7 +28,7 @@ namespace WeDoBlog.Controllers
         }
 
         [HttpGet]
-         public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create()
         {
             CategoryViewModel categoryViewModel = new CategoryViewModel();
             return View(categoryViewModel);
@@ -36,13 +36,13 @@ namespace WeDoBlog.Controllers
 
 
         [HttpPost]
-         public async Task<IActionResult> Create(CategoryViewModel categoryViewModel)
+        public async Task<IActionResult> Create(CategoryViewModel categoryViewModel)
         {
 
-            
+
             if (ModelState.IsValid)
             {
-                var category= new Category
+                var category = new Category
                 {
                     Name = categoryViewModel.Name,
                     Description = categoryViewModel.Description
@@ -55,7 +55,7 @@ namespace WeDoBlog.Controllers
         }
 
 
-         public IActionResult Edit(int id)
+        public IActionResult Edit(int id)
         {
             return View();
         }
